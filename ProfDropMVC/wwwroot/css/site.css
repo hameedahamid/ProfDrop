@@ -1,0 +1,298 @@
+/* general page styling */
+
+html {
+    font-size: 14px;
+    min-height: 100%;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: #f5f8f8;
+    color: #183238;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+main {
+    flex: 1;
+}
+
+.container {
+    max-width: 1150px;
+}
+
+/* headings and text */
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+    color: #183238;
+    font-weight: 700;
+}
+
+.text-muted {
+    color: #6d7b7e;
+}
+
+/* navbar */
+
+.navbar {
+    background-color: #ffffff;
+    padding: 14px 25px;
+    border-bottom: 1px solid #dce6e8;
+}
+
+.navbar-brand {
+    color: #0b5968;
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.nav-link {
+    color: #183238;
+    margin-left: 10px;
+}
+
+.nav-link:hover {
+    color: #0b5968;
+}
+
+.nav-divider {
+    width: 1px;
+    height: 26px;
+    background-color: #0b5968;
+    opacity: 0.35;
+    margin: 0 10px;
+    flex-shrink: 0;
+}
+
+/* cards */
+
+.card,
+.home-option-card {
+    background-color: #ffffff;
+    border: 1px solid #dce6e8;
+    border-radius: 16px;
+}
+
+.card {
+    box-shadow: 0 5px 18px rgba(11, 89, 104, 0.08);
+}
+
+.card-body {
+    padding: 24px;
+}
+
+/* buttons */
+
+.btn {
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-weight: 600;
+}
+
+.btn-primary {
+    background-color: #0b5968;
+    border-color: #0b5968;
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background-color: #084653;
+    border-color: #084653;
+}
+
+.btn-outline-primary {
+    color: #0b5968;
+    border-color: #0b5968;
+}
+
+.btn-outline-primary:hover {
+    background-color: #0b5968;
+    border-color: #0b5968;
+    color: #ffffff;
+}
+
+/* form styling */
+
+.form-label {
+    font-weight: 600;
+    color: #183238;
+}
+
+.form-control,
+.form-select {
+    background-color: #ffffff;
+    border: 1px solid #dce6e8;
+    border-radius: 10px;
+    padding: 12px 14px;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #0b5968; 
+    box-shadow: 0 0 0 0.2rem rgba(11, 89, 104, 0.15);
+}
+
+textarea.form-control {
+    min-height: 140px;
+}
+
+/* lecturer details */
+
+#lecturerSection {
+    background-color: #f4f8da;
+    border-radius: 12px;
+    padding: 15px;
+}
+
+.lecturer-profile {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.lecturer-dashboard-photo {
+    width: 85px;
+    height: 85px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #d8ef63;
+}
+
+/* dashboard course cards */
+
+.course-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.course-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 22px rgba(11, 89, 104, 0.12);
+}
+
+/* feedback cards */
+
+.feedback-card {
+    border-left: 5px solid #0b5968;
+}
+
+/* links */
+
+a {
+    color: #0b5968;
+}
+
+a:hover {
+    color: #084653;
+}
+
+/* home page */
+
+.home-hero {
+    max-width: 850px;
+    margin: 80px auto;
+    text-align: center;
+}
+
+.hero-badge {
+    display: inline-block;
+    background-color: #f4f8da;
+    color: #084653;
+    padding: 7px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    margin-bottom: 10px;
+}
+
+    .hero-title span {
+        color: #0b5968;
+    }
+
+.hero-subtitle {
+    font-size: 1.35rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.hero-description {
+    max-width: 550px;
+    margin: 0 auto 30px;
+    color: #6d7b7e;
+}
+
+.hero-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 55px;
+}
+
+/* home page option cards */
+
+.home-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.home-option-card {
+    padding: 28px;
+    text-align: left;
+    box-shadow: 0 5px 18px rgba(11, 89, 104, 0.06);
+}
+
+.option-icon {
+    font-size: 2rem;
+    margin-bottom: 12px;
+}
+
+.home-option-card h4 {
+    margin-bottom: 8px;
+}
+
+.home-option-card p {
+    color: #6d7b7e;
+    margin: 0;
+}
+
+/* success page */
+
+.success-tick {
+    color: #2e9b62;
+    font-size: 3.5rem;
+    font-weight: 700;
+}
+
+.success-card {
+    border-top: 5px solid #2e9b62;
+}
+
+/* footer */
+
+.footer {
+    position: static;
+    bottom: auto;
+    width: 100%;
+    margin-top: 40px;
+    padding: 8px 0;
+    background-color: #ffffff;
+    border-top: 1px solid #dce6e8;
+    line-height: normal;
+}

@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="ProfDropFunctions/ProfDropFunctions.csproj" />
+  <Project Path="ProfDropMVC/ProfDropMVC.csproj" />
+</Solution>
