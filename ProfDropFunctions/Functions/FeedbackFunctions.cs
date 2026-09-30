@@ -59,18 +59,22 @@ namespace ProfDropFunctions.Functions
                 string message = data.Message.Trim();
 
                 // Prevent extremely long feedback messages
-                if (message.Length > 1000)
-                    return await BadRequest(req, "Feedback message must be 1000 characters or less.");
+                if (message.Length > 2000)
+                    return await BadRequest(req, "Feedback message must be 2000 characters or less.");
 
                 // Check that the category is one of the categories used by the system
                 if (category.Equals("explanation", StringComparison.OrdinalIgnoreCase))
                     category = "Explanation";
                 else if (category.Equals("lecture pace", StringComparison.OrdinalIgnoreCase))
                     category = "Lecture Pace";
+                else if (category.Equals("course material", StringComparison.OrdinalIgnoreCase))
+                    category = "Course Material";
                 else if (category.Equals("assessment", StringComparison.OrdinalIgnoreCase))
                     category = "Assessment";
+                else if (category.Equals("other", StringComparison.OrdinalIgnoreCase))
+                    category = "Other";
                 else
-                    return await BadRequest(req, "Invalid feedback category. Use Explanation, Lecture Pace or Assessment.");
+                    return await BadRequest(req, "Invalid feedback category. Use Lecture Pace, Explanation, Course Material, Assessment or Other.");
 
                 // Check that the course exists before saving the feedback
                 var courseResult = await courseTableClient.GetEntityIfExistsAsync<Course>(
@@ -104,7 +108,7 @@ namespace ProfDropFunctions.Functions
                     feedbackId = feedback.FeedbackId,
                     courseCode = feedback.CourseCode,
                     category = feedback.Category,
-                    dateSubmitted = feedback.DateSubmitted
+                    submittedAt = feedback.DateSubmitted
                 });
 
                 return response;
@@ -131,7 +135,7 @@ namespace ProfDropFunctions.Functions
                 await feedbackTableClient.CreateIfNotExistsAsync();
                 await courseTableClient.CreateIfNotExistsAsync();
 
-                string lecturerEmail = email.Trim().ToLower();
+                string lecturerId = email.Trim().ToLower();
                 string courseCode = code.Trim().ToUpper();
 
                 // Check that the course exists
@@ -145,7 +149,7 @@ namespace ProfDropFunctions.Functions
                 var course = courseResult.Value;
 
                 // Make sure the lecturer requesting the feedback owns this course
-                if (!course.LecturerEmail.Equals(lecturerEmail, StringComparison.OrdinalIgnoreCase))
+                if (!course.LecturerId.Equals(lecturerId, StringComparison.OrdinalIgnoreCase))
                     return await Forbidden(req, "You do not have access to this course's feedback.");
 
                 string category = string.Empty;
@@ -163,8 +167,12 @@ namespace ProfDropFunctions.Functions
                         category = "Explanation";
                     else if (category.Equals("lecture pace", StringComparison.OrdinalIgnoreCase))
                         category = "Lecture Pace";
+                    else if (category.Equals("course material", StringComparison.OrdinalIgnoreCase))
+                        category = "Course Material";
                     else if (category.Equals("assessment", StringComparison.OrdinalIgnoreCase))
                         category = "Assessment";
+                    else if (category.Equals("other", StringComparison.OrdinalIgnoreCase))
+                        category = "Other";
                     else
                         return await BadRequest(req, "Invalid feedback category.");
                 }
@@ -172,8 +180,7 @@ namespace ProfDropFunctions.Functions
                 var feedbackList = new List<Feedback>();
 
                 // Get all feedback belonging to this course
-                await foreach (Feedback feedback in feedbackTableClient.QueryAsync<Feedback>(
-                    x => x.PartitionKey == FeedbackPartition && x.CourseCode == courseCode))
+                await foreach (Feedback feedback in feedbackTableClient.QueryAsync<Feedback>(x => x.PartitionKey == FeedbackPartition && x.CourseCode == courseCode))
                 {
                     // If no category was selected, return all feedback.
                     // Otherwise, only return feedback matching the selected category.
@@ -182,12 +189,20 @@ namespace ProfDropFunctions.Functions
                 }
 
                 // Show the newest feedback first
-                feedbackList = feedbackList
-                    .OrderByDescending(x => x.DateSubmitted)
-                    .ToList();
+                feedbackList = feedbackList.OrderByDescending(x => x.DateSubmitted).ToList();
 
                 var response = req.CreateResponse(HttpStatusCode.OK);
-                await response.WriteAsJsonAsync(feedbackList);
+
+                var feedbackResults = feedbackList.Select(feedback => new
+                {
+                    feedbackId = feedback.FeedbackId,
+                    courseCode = feedback.CourseCode,
+                    category = feedback.Category,
+                    message = feedback.Message,
+                    submittedAt = feedback.DateSubmitted
+                }).ToList();
+
+                await response.WriteAsJsonAsync(feedbackResults);
                 return response;
             }
             catch (Exception ex)
