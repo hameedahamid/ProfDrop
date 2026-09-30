@@ -1,6 +1,99 @@
-﻿namespace ProfDropMVC.Views.Feedback
-{
-    public class Index
-    {
-    }
+﻿@model ProfDropMVC.Models.FeedbackViewModel
+
+@{
+    ViewData["Title"] = "Submit Feedback";
+}
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+
+            <div class="mb-4">
+                <h1>Submit Feedback</h1>
+                <p class="text-muted">
+                    Share your feedback to help improve your course.
+                </p>
+            </div>
+
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+
+                    <form asp-controller="Feedback" asp-action="Index" method="post">
+
+                        @* Select the course the feedback is about *@
+                        <div class="mb-3">
+                            <label asp-for="CourseCode" class="form-label">Course</label>
+
+                            <select asp-for="CourseCode" class="form-select">
+                                <option value="">-- Select a course --</option>
+
+                                @foreach (var course in Model.Courses)
+                                {
+                                    <option value="@course.CourseCode">
+                                        @course.CourseCode - @course.CourseName
+                                    </option>
+                                }
+                            </select>
+
+                            <span asp-validation-for="CourseCode" class="text-danger"></span>
+                        </div>
+
+                        @* Select the feedback category *@
+                        <div class="mb-3">
+                            <label asp-for="Category" class="form-label">Feedback Category</label>
+
+                            <select asp-for="Category" class="form-select">
+                                <option value="">-- Select a category --</option>
+                                <option value="Lecture Pace">Lecture Pace</option>
+                                <option value="Explanation">Explanation</option>
+                                <option value="Course Material">Course Material</option>
+                                <option value="Assessment">Assessment</option>
+                                <option value="Other">Other</option>
+                            </select>
+
+                            <span asp-validation-for="Category" class="text-danger"></span>
+                        </div>
+
+                        @* Enter the anonymous feedback message *@  
+                        <div class="mb-3">
+                            <label asp-for="Message" class="form-label">Your Feedback</label>
+
+                            <textarea asp-for="Message"
+                                      class="form-control"
+                                      rows="6"
+                                      maxlength="2000"
+                                      placeholder="Enter your feedback here..."></textarea>
+
+                            <span asp-validation-for="Message" class="text-danger"></span>
+
+                            <small class="text-muted">
+                                Maximum 2000 characters.
+                            </small>
+                        </div>
+
+                        @* Explain that the feedback is anonymous *@    
+                        <div class="alert alert-light border">
+                            <strong>Anonymous Feedback</strong>
+                            <p class="mb-0 mt-1">
+                                Your identity is not stored with your feedback.
+                            </p>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            Submit Feedback
+                        </button>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }
