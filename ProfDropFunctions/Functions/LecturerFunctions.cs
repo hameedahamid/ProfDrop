@@ -299,8 +299,8 @@ public class LecturerFunctions
 
     // POST endpoint used to log a lecturer in.
     [Function("LoginLecturer")]
-    public async Task<HttpResponseData> LoginLecturer([HttpTrigger(AuthorizationLevel.Function,"post",Route = "lecturers/login")] HttpRequestData req,
-        [TableInput(TableName,Connection = "AzureWebJobsStorage")] TableClient tableClient)
+    public async Task<HttpResponseData> LoginLecturer([HttpTrigger(AuthorizationLevel.Function, "post", Route = "lecturers/login")] HttpRequestData req,
+        [TableInput(TableName, Connection = "AzureWebJobsStorage")] TableClient tableClient)
     {
         try
         {
@@ -308,45 +308,45 @@ public class LecturerFunctions
             await tableClient.CreateIfNotExistsAsync();
 
             // Read the email and password from the request.
-            var data = await JsonSerializer.DeserializeAsync<LoginRequest>(req.Body,new JsonSerializerOptions{PropertyNameCaseInsensitive = true});
+            var data = await JsonSerializer.DeserializeAsync<LoginRequest>(req.Body, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             // Check that both login fields were entered.
             if (data == null ||
                 string.IsNullOrWhiteSpace(data.Email) ||
                 string.IsNullOrWhiteSpace(data.Password))
             {
-                return await BadRequest(req,"Email and password are required.");
+                return await BadRequest(req, "Email and password are required.");
             }
 
             // Clean the email and change it to lowercase.
             string email = data.Email.Trim().ToLower();
 
             // Find the lecturer using the email as the RowKey.
-            var lecturerResult =await tableClient.GetEntityIfExistsAsync<Lecturer>(LecturerPartition,email);
+            var lecturerResult = await tableClient.GetEntityIfExistsAsync<Lecturer>(LecturerPartition, email);
 
             // Return 401 if the lecturer was not found.
             if (!lecturerResult.HasValue)
             {
-                return await Unauthorized(req,"Incorrect email or password.");
+                return await Unauthorized(req, "Incorrect email or password.");
             }
 
             // Get the lecturer that was found.
             Lecturer lecturer = lecturerResult.Value;
 
             // Create the password hasher.
-            var passwordHasher =new PasswordHasher<Lecturer>();
+            var passwordHasher = new PasswordHasher<Lecturer>();
 
             // Compare the entered password to the saved password hash.
-            var passwordResult =passwordHasher.VerifyHashedPassword(lecturer,lecturer.PasswordHash,data.Password);
+            var passwordResult = passwordHasher.VerifyHashedPassword(lecturer, lecturer.PasswordHash, data.Password);
 
             // Return 401 if the password is incorrect.
-            if (passwordResult ==PasswordVerificationResult.Failed)
+            if (passwordResult == PasswordVerificationResult.Failed)
             {
-                return await Unauthorized(req,"Incorrect email or password.");
+                return await Unauthorized(req, "Incorrect email or password.");
             }
 
             // Create a successful response.
-            var response =req.CreateResponse(HttpStatusCode.OK);
+            var response = req.CreateResponse(HttpStatusCode.OK);
 
             // Return the lecturer details needed by the MVC app.
             await response.WriteAsJsonAsync(new
@@ -364,10 +364,10 @@ public class LecturerFunctions
         catch (Exception ex)
         {
             // Record the error.
-            _logger.LogError(ex,"Error logging lecturer in.");
+            _logger.LogError(ex, "Error logging lecturer in.");
 
             // Return a server error.
-            return await InternalServerError(req,"An error occurred while logging in.");
+            return await InternalServerError(req, "An error occurred while logging in.");
         }
     }
 
@@ -400,20 +400,6 @@ public class LecturerFunctions
         });
         return response;
     }
-
-
-    // Helper method that returns 404 Not Found.
-    private static async Task<HttpResponseData> NotFound(HttpRequestData req, string message)
-    {
-        var response =
-            req.CreateResponse(HttpStatusCode.NotFound);
-        await response.WriteAsJsonAsync(new
-        {
-            error = message
-        });
-        return response;
-    }
-
 
     // Helper method that returns 409 Conflict.
     private static async Task<HttpResponseData> Conflict(HttpRequestData req, string message)

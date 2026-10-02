@@ -135,7 +135,7 @@ namespace ProfDropFunctions.Functions
                 await feedbackTableClient.CreateIfNotExistsAsync();
                 await courseTableClient.CreateIfNotExistsAsync();
 
-                string lecturerId = email.Trim().ToLower();
+                string lecturerEmail = email.Trim().ToLower();
                 string courseCode = code.Trim().ToUpper();
 
                 // Check that the course exists
@@ -149,7 +149,7 @@ namespace ProfDropFunctions.Functions
                 var course = courseResult.Value;
 
                 // Make sure the lecturer requesting the feedback owns this course
-                if (!course.LecturerId.Equals(lecturerId, StringComparison.OrdinalIgnoreCase))
+                if (!course.LecturerEmail.Equals(lecturerEmail, StringComparison.OrdinalIgnoreCase))
                     return await Forbidden(req, "You do not have access to this course's feedback.");
 
                 string category = string.Empty;

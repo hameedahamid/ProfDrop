@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+
 namespace ProfDropMVC
 {
     public class Program
@@ -8,6 +10,23 @@ namespace ProfDropMVC
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            // Set up cookie authentication for lecturer login
+            builder.Services
+                .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Account/Login";
+                    options.AccessDeniedPath = "/Account/AccessDenied";
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+                    options.SlidingExpiration = true;
+                });
+
+            // Sets up the HTTP client used to call the ProfDrop Functions API.
+            builder.Services.AddHttpClient("ProfDropApi", client =>
+            {
+                client.BaseAddress = new Uri(builder.Configuration["ProfDropApi:BaseUrl"] ?? throw new InvalidOperationException("ProfDropApi:BaseUrl is missing."));
+            });
 
             var app = builder.Build();
 
@@ -22,6 +41,8 @@ namespace ProfDropMVC
             app.UseHttpsRedirection();
             app.UseRouting();
 
+            // Read the login cookie before checking access to protected pages.
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapStaticAssets();

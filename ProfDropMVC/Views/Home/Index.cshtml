@@ -1,8 +1,61 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿﻿@{
+ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="home-hero">
+    <div class="hero-badge">
+        Anonymous Lecturer Feedback
+    </div>
+
+    <h1 class="hero-title">
+        Prof<span>Drop</span>
+    </h1>
+
+    <p class="hero-subtitle">
+        Say it anonymously. Make learning better.
+    </p>
+
+    <p class="hero-description">
+        Share constructive feedback with your lecturers
+        in a simple and anonymous way.
+    </p>
+
+    <div class="hero-buttons">
+
+        <a asp-controller="Feedback" asp-action="Index" class="btn btn-primary">Give Feedback</a>
+
+        @if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+            <a asp-controller="Lecturer" asp-action="Dashboard" class="btn btn-outline-primary">Lecturer Dashboard</a>
+        }
+        else
+        {
+            <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary">Lecturer Login</a>
+        }
+
+    </div>
+
+    <div class="home-options">
+        <div class="home-option-card">
+            <div class="option-icon">🎓</div>
+
+            <h4>For Students</h4>
+
+            <p>
+                Share anonymous feedback about
+                your lecturer and course experience.
+            </p>
+        </div>
+
+        <div class="home-option-card">
+            <div class="option-icon">👩‍🏫</div>
+
+            <h4>For Lecturers</h4>
+
+            <p>
+                View student feedback for your
+                courses and filter it by category.
+            </p>
+        </div>
+    </div>
 </div>

@@ -50,19 +50,19 @@ namespace ProfDropFunctions.Functions
                 if (string.IsNullOrWhiteSpace(data.Name))
                     return await BadRequest(req, "Course name is required.");
 
-                if (string.IsNullOrWhiteSpace(data.LecturerId))
+                if (string.IsNullOrWhiteSpace(data.LecturerEmail))
                     return await BadRequest(req, "Lecturer ID is required.");
 
                 string courseCode = data.CourseCode.Trim().ToUpper();
                 string courseName = data.Name.Trim();
                 // The Lecturer table uses the lecturer's email as the RowKey,
                 // so LecturerId contains the lecturer's email in this version
-                string lecturerId = data.LecturerId.Trim().ToLower();
+                string lecturerEmail = data.LecturerEmail.Trim().ToLower();
 
                 // Check that the lecturer exists using their email as the RowKey
                 var lecturerResult = await lecturerTableClient.GetEntityIfExistsAsync<Lecturer>(
                     LecturerPartition,
-                    lecturerId);
+                    lecturerEmail);
 
                 if (!lecturerResult.HasValue)
                     return await NotFound(req, "The lecturer with this ID was not found.");
@@ -82,7 +82,7 @@ namespace ProfDropFunctions.Functions
                     RowKey = courseCode,
                     CourseCode = courseCode,
                     Name = courseName,
-                    LecturerId = lecturerId
+                    LecturerEmail = lecturerEmail
                 };
 
                 await courseTableClient.AddEntityAsync(course);
@@ -94,7 +94,7 @@ namespace ProfDropFunctions.Functions
                     message = "Course created successfully.",
                     courseCode = course.CourseCode,
                     courseName = course.Name,
-                    lecturerId = course.LecturerId
+                    lecturerEmail = course.LecturerEmail
                 });
 
                 return response;
@@ -127,7 +127,7 @@ namespace ProfDropFunctions.Functions
                     // Use the lecturer ID stored in the course to find the lecturer
                     var lecturerResult = await lecturerTableClient.GetEntityIfExistsAsync<Lecturer>(
                         LecturerPartition,
-                        course.LecturerId);
+                        course.LecturerEmail);
 
                     if (lecturerResult.HasValue)
                     {
@@ -137,7 +137,7 @@ namespace ProfDropFunctions.Functions
                         {
                             courseCode = course.CourseCode,
                             courseName = course.Name,
-                            lecturerId = course.LecturerId,
+                            lecturerEmail = course.LecturerEmail,
                             lecturerName = lecturer.Name,
                             profileUrl = lecturer.ProfileUrl
                         });
@@ -184,7 +184,7 @@ namespace ProfDropFunctions.Functions
                 // Use the lecturer ID stored in the course to find the lecturer
                 var lecturerResult = await lecturerTableClient.GetEntityIfExistsAsync<Lecturer>(
                     LecturerPartition,
-                    course.LecturerId);
+                    course.LecturerEmail);
 
                 if (!lecturerResult.HasValue)
                     return await NotFound(req, "The lecturer assigned to this course was not found.");
@@ -197,7 +197,7 @@ namespace ProfDropFunctions.Functions
                 {
                     courseCode = course.CourseCode,
                     courseName = course.Name,
-                    lecturerId = course.LecturerId,
+                    lecturerEmail = course.LecturerEmail,
                     lecturerName = lecturer.Name,
                     profileUrl = lecturer.ProfileUrl
                 });
@@ -223,18 +223,18 @@ namespace ProfDropFunctions.Functions
                 // Create the Courses table if it does not already exist
                 await courseTableClient.CreateIfNotExistsAsync();
 
-                string lecturerId = email.Trim().ToLower();
+                string lecturerEmail = email.Trim().ToLower();
 
                 var courses = new List<object>();
 
-                // Find all courses where the lecturer ID matches
-                await foreach (Course course in courseTableClient.QueryAsync<Course>(x => x.PartitionKey == CoursePartition && x.LecturerId == lecturerId))
+                // Find all courses where the lecturer email matches
+                await foreach (Course course in courseTableClient.QueryAsync<Course>(x => x.PartitionKey == CoursePartition && x.LecturerEmail == lecturerEmail))
                 {
                     courses.Add(new
                     {
                         courseCode = course.CourseCode,
                         courseName = course.Name,
-                        lecturerId = course.LecturerId
+                        lecturerEmail = course.LecturerEmail
                     });
                 }
 
