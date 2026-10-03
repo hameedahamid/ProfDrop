@@ -51,12 +51,12 @@ namespace ProfDropFunctions.Functions
                     return await BadRequest(req, "Course name is required.");
 
                 if (string.IsNullOrWhiteSpace(data.LecturerEmail))
-                    return await BadRequest(req, "Lecturer ID is required.");
+                    return await BadRequest(req, "Lecturer email is required.");
 
                 string courseCode = data.CourseCode.Trim().ToUpper();
                 string courseName = data.Name.Trim();
                 // The Lecturer table uses the lecturer's email as the RowKey,
-                // so LecturerId contains the lecturer's email in this version
+                // so LecturerEmail contains the lecturer's email in this version
                 string lecturerEmail = data.LecturerEmail.Trim().ToLower();
 
                 // Check that the lecturer exists using their email as the RowKey
@@ -65,7 +65,7 @@ namespace ProfDropFunctions.Functions
                     lecturerEmail);
 
                 if (!lecturerResult.HasValue)
-                    return await NotFound(req, "The lecturer with this ID was not found.");
+                    return await NotFound(req, "The lecturer with this email was not found.");
 
                 // Check if the course already exists
                 var existingCourse = await courseTableClient.GetEntityIfExistsAsync<Course>(
@@ -75,7 +75,7 @@ namespace ProfDropFunctions.Functions
                 if (existingCourse.HasValue)
                     return await Conflict(req, "A course with this course code already exists.");
 
-                // Save the lecturer ID with the course so we know which lecturer owns it
+                // Save the lecturer email with the course so we know which lecturer owns it
                 var course = new Course
                 {
                     PartitionKey = CoursePartition,
@@ -124,7 +124,7 @@ namespace ProfDropFunctions.Functions
                 // Get all courses from the COURSE partition
                 await foreach (Course course in courseTableClient.QueryAsync<Course>(x => x.PartitionKey == CoursePartition))
                 {
-                    // Use the lecturer ID stored in the course to find the lecturer
+                    // Use the lecturer email stored in the course to find the lecturer
                     var lecturerResult = await lecturerTableClient.GetEntityIfExistsAsync<Lecturer>(
                         LecturerPartition,
                         course.LecturerEmail);
