@@ -280,23 +280,6 @@ textarea.form-control {
     border-top: 5px solid #2e9b62;
 }
 
-/* footer stays below the page content */
-
-.footer {
-    width: 100%;
-    padding: 8px 0;
-    background-color: #ffffff;
-    border-top: 1px solid #dce6e8;
-}
-
-body > footer.footer {
-    position: static !important;
-    bottom: auto !important;
-    margin-top: 0 !important;
-    line-height: normal !important;
-    white-space: normal !important;
-}
-
 /* stack the home cards on small screens */
 
 @media (max-width: 768px) {
