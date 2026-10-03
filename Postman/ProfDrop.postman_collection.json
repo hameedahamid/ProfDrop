@@ -1,0 +1,1183 @@
+{
+  "info": {
+    "_postman_id": "d8ce3254-dca0-4255-8078-8d16e999f3bf",
+    "name": "ProfDrop",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "56824246",
+    "_collection_link": "https://go.postman.co/collection/56824246-d8ce3254-dca0-4255-8078-8d16e999f3bf?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Lecturers",
+      "item": [
+        {
+          "name": "Create Lecturer - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {\n    pm.response.to.have.status(201);\n});\npm.test(\"Lecturer was created\", function () {\n    const json = pm.response.json();\n    pm.expect(json.message).to.eql(\"Lecturer created successfully.\");\n    pm.expect(json.email).to.eql(pm.collectionVariables.get(\"lecturerEmail\"));\n    pm.expect(json.profileUrl).to.be.a('string').and.not.empty;\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Test Lecturer",
+                  "type": "text"
+                },
+                {
+                  "key": "email",
+                  "value": "{{lecturerEmail}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{lecturerPassword}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "test-profile.png"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lecturers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lecturers"
+              ]
+            },
+            "description": "Creates a unique lecturer. Uses test-profile.png as the required profile image."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Lecturer - Duplicate Email",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 409\", function () {\n    pm.response.to.have.status(409);\n});\npm.test(\"Duplicate lecturer is rejected\", function () {\n    const json = pm.response.json();\n    pm.expect(json.error).to.eql(\"A lecturer with this email already exists.\");\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Test Lecturer",
+                  "type": "text"
+                },
+                {
+                  "key": "email",
+                  "value": "{{lecturerEmail}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{lecturerPassword}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "test-profile.png"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lecturers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lecturers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Lecturer - Invalid Email",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {\n    pm.response.to.have.status(400);\n});\npm.test(\"Invalid email validation message is returned\", function () {\n    const json = pm.response.json();\n    pm.expect(json.error).to.eql(\"Please enter a valid email address.\");\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Test Lecturer",
+                  "type": "text"
+                },
+                {
+                  "key": "email",
+                  "value": "testingInvalidEmail",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{lecturerPassword}}",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "test-profile.png"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lecturers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lecturers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Lecturer - Weak Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {\n    pm.response.to.have.status(400);\n});\npm.test(\"Weak password is rejected\", function () {\n    const json = pm.response.json();\n    pm.expect(json.error).to.include(\"Password must be at least 8 characters\");\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Test Lecturer",
+                  "type": "text"
+                },
+                {
+                  "key": "email",
+                  "value": "{{lecturerEmail}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "hello",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "test-profile.png"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lecturers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lecturers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Lecturer - Missing Image",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {\n    pm.response.to.have.status(400);\n});\npm.test(\"Profile image is required\", function () {\n    const json = pm.response.json();\n    pm.expect(json.error).to.eql(\"A profile image is required.\");\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Test Lecturer",
+                  "type": "text"
+                },
+                {
+                  "key": "email",
+                  "value": "{{lecturerEmail}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{lecturerPassword}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lecturers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lecturers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login Lecturer - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Login succeeds and lecturer details are returned\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.message).to.eql(\"Login successful.\");",
+                  "    pm.expect(json.email).to.eql(pm.collectionVariables.get(\"lecturerEmail\"));",
+                  "    pm.expect(json.name).to.be.a('string').and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{lecturerEmail}}\",\n  \"password\": \"{{lecturerPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lecturers/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lecturers",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login Lecturer - Wrong Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test(\"Wrong password is rejected\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.error).to.eql(\"Incorrect email or password.\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{lecturerEmail}}\",\n  \"password\": \"Wrong1234\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lecturers/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lecturers",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login Lecturer - Missing Fields",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Missing login fields are rejected\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.error).to.eql(\"Email and password are required.\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"\",\n  \"password\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lecturers/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lecturers",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Courses",
+      "item": [
+        {
+          "name": "Create Course - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Course was created correctly\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.message).to.eql(\"Course created successfully.\");",
+                  "    pm.expect(json.courseCode).to.eql(pm.collectionVariables.get(\"courseCode\"));",
+                  "    pm.expect(json.lecturerEmail).to.eql(pm.collectionVariables.get(\"lecturerEmail\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseCode\": \"{{courseCode}}\",\n  \"name\": \"{{courseName}}\",\n  \"lecturerEmail\": \"{{lecturerEmail}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/courses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Course - Duplicate Code",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 409\", function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "pm.test(\"Duplicate course code is rejected\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.message).to.eql(\"A course with this course code already exists.\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseCode\": \"{{courseCode}}\",\n  \"name\": \"{{courseName}}\",\n  \"lecturerEmail\": \"{{lecturerEmail}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/courses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Course - Missing Course Code",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Course code is required\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.message).to.eql(\"Course code is required.\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseCode\": \"\",\n  \"name\": \"No Code Course\",\n  \"lecturerEmail\": \"{{lecturerEmail}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/courses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Course - Lecturer Does Not Exist",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {\n    pm.response.to.have.status(404);\n});\npm.test(\"Unknown lecturer is rejected\", function () {\n    const json = pm.response.json();\n    pm.expect(json.message).to.eql(\"The lecturer with this email was not found.\");\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseCode\": \"PEHU7923\",\n  \"name\": \"Testing\",\n  \"lecturerEmail\": \"invalid@gmail.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/courses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Courses",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response is an array and contains the created course\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "    const found = json.some(c => c.courseCode === pm.collectionVariables.get(\"courseCode\"));",
+                  "    pm.expect(found).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Course - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Correct course is returned\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.courseCode).to.eql(pm.collectionVariables.get(\"courseCode\"));",
+                  "    pm.expect(json.lecturerEmail).to.eql(pm.collectionVariables.get(\"lecturerEmail\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseCode}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseCode}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Course - Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {\n    pm.response.to.have.status(404);\n});\npm.test(\"Missing course returns correct message\", function () {\n    const json = pm.response.json();\n    pm.expect(json.message).to.eql(\"Course was not found.\");\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/wrong",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "wrong"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Lecturer Courses",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Lecturer course list contains the created course\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "    const found = json.some(c => c.courseCode === pm.collectionVariables.get(\"courseCode\"));",
+                  "    pm.expect(found).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/lecturers/{{lecturerEmail}}/courses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lecturers",
+                "{{lecturerEmail}}",
+                "courses"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Feedback",
+      "item": [
+        {
+          "name": "Submit Feedback - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Feedback was created and category was normalised\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.message).to.eql(\"Feedback submitted successfully.\");",
+                  "    pm.expect(json.category).to.eql(\"Explanation\");",
+                  "    pm.expect(json.courseCode).to.eql(pm.collectionVariables.get(\"courseCode\"));",
+                  "    pm.expect(json.feedbackId).to.be.a(\"string\").and.not.empty;",
+                  "    pm.collectionVariables.set(\"feedbackId\", json.feedbackId);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseCode\": \"{{courseCode}}\",\n  \"category\": \"explanation\",\n  \"message\": \"The explanation was clear and easy to follow.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/feedback",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "feedback"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Feedback - Second Category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Second feedback entry was created\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.category).to.eql(\"Lecture Pace\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseCode\": \"{{courseCode}}\",\n  \"category\": \"Lecture Pace\",\n  \"message\": \"The lecture pace was comfortable.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/feedback",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "feedback"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Feedback - Invalid Category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Invalid category is rejected\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.message).to.include(\"Invalid feedback category\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseCode\": \"{{courseCode}}\",\n  \"category\": \"Random Category\",\n  \"message\": \"Testing category validation.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/feedback",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "feedback"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Feedback - Course Does Not Exist",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {\n    pm.response.to.have.status(404);\n});\npm.test(\"Feedback cannot be submitted to an unknown course\", function () {\n    const json = pm.response.json();\n    pm.expect(json.message).to.eql(\"The course was not found.\");\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseCode\": \"No course\",\n  \"category\": \"Other\",\n  \"message\": \"Testing a missing course.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/feedback",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "feedback"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Feedback - Missing Message",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Feedback message is required\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.message).to.eql(\"Feedback message is required.\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseCode\": \"{{courseCode}}\",\n  \"category\": \"Other\",\n  \"message\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/feedback",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "feedback"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Course Feedback - All",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Feedback list contains the feedback created earlier\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "    const found = json.some(f => f.feedbackId === pm.collectionVariables.get(\"feedbackId\"));",
+                  "    pm.expect(found).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/lecturers/{{lecturerEmail}}/courses/{{courseCode}}/feedback",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lecturers",
+                "{{lecturerEmail}}",
+                "courses",
+                "{{courseCode}}",
+                "feedback"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Course Feedback - Filter Explanation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Only Explanation feedback is returned\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "    pm.expect(json.length).to.be.greaterThan(0);",
+                  "    json.forEach(f => pm.expect(f.category).to.eql(\"Explanation\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/lecturers/{{lecturerEmail}}/courses/{{courseCode}}/feedback?category=explanation",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lecturers",
+                "{{lecturerEmail}}",
+                "courses",
+                "{{courseCode}}",
+                "feedback"
+              ],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "explanation"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Course Feedback - Wrong Lecturer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () {\n    pm.response.to.have.status(403);\n});\npm.test(\"A different lecturer cannot view the course feedback\", function () {\n    const json = pm.response.json();\n    pm.expect(json.message).to.eql(\"You do not have access to this course's feedback.\");\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/lecturers/invalid@gmail.com/courses/{{courseCode}}/feedback",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lecturers",
+                "invalid@gmail.com",
+                "courses",
+                "{{courseCode}}",
+                "feedback"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Course Feedback - Course Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {\n    pm.response.to.have.status(404);\n});\npm.test(\"Missing course returns 404\", function () {\n    const json = pm.response.json();\n    pm.expect(json.message).to.eql(\"The course was not found.\");\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/lecturers/{{lecturerEmail}}/courses/none/feedback",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lecturers",
+                "{{lecturerEmail}}",
+                "courses",
+                "none",
+                "feedback"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:7293/api"
+    },
+    {
+      "key": "lecturerEmail",
+      "value": "test@gmail.com"
+    },
+    {
+      "key": "lecturerPassword",
+      "value": "Test1234"
+    },
+    {
+      "key": "courseCode",
+      "value": "AJGR7854"
+    },
+    {
+      "key": "courseName",
+      "value": "Test Course"
+    }
+  ]
+}
