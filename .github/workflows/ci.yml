@@ -34,29 +34,26 @@ jobs:
       - name: Build solution
         run: dotnet build ProfDrop.slnx --configuration Release --no-restore
 
-  security:
-    name: CodeQL Security Scan
-    runs-on: ubuntu-latest
+security:
+  name: CodeQL Security Scan
+  runs-on: ubuntu-latest
 
-    permissions:
-      contents: read
-      security-events: write
+  permissions:
+    contents: read
+    security-events: write
+    actions: read
 
-    steps:
-      # Gets the latest code from the repository
-      - name: Checkout repository
-        uses: actions/checkout@v7
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v7
 
-      # Sets up CodeQL for the C# code in ProfDrop
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v4
-        with:
-          languages: csharp
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v4
+      with:
+        languages: csharp
 
-      # CodeQL builds the projects so it can analyse the compiled code
-      - name: Build for CodeQL
-        uses: github/codeql-action/autobuild@v4
+    - name: Build for CodeQL
+      uses: github/codeql-action/autobuild@v4
 
-      # Runs the security analysis and uploads the results to GitHub
-      - name: Run CodeQL analysis
-        uses: github/codeql-action/analyze@v4
+    - name: Run CodeQL analysis
+      uses: github/codeql-action/analyze@v4
