@@ -593,7 +593,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is 404\", function () {\n    pm.response.to.have.status(404);\n});\npm.test(\"Unknown lecturer is rejected\", function () {\n    const json = pm.response.json();\n    pm.expect(json.message).to.eql(\"The lecturer with this ID was not found.\");\n});"
+                  "pm.test(\"Status code is 404\", function () {\n    pm.response.to.have.status(404);\n});\npm.test(\"Unknown lecturer is rejected\", function () {\n    const json = pm.response.json();\n    pm.expect(json.message).to.eql(\"The lecturer with this email was not found.\");\n});"
                 ]
               }
             }
