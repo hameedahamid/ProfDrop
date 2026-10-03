@@ -1,10 +1,10 @@
 {
   "info": {
-    "_postman_id": "d8ce3254-dca0-4255-8078-8d16e999f3bf",
+    "_postman_id": "b3b977fb-eace-43f3-9886-80bc86732250",
     "name": "ProfDrop",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "56824246",
-    "_collection_link": "https://go.postman.co/collection/56824246-d8ce3254-dca0-4255-8078-8d16e999f3bf?source=collection_link"
+    "_exporter_id": "56824099",
+    "_collection_link": "https://go.postman.co/collection/56824099-b3b977fb-eace-43f3-9886-80bc86732250?source=collection_link"
   },
   "item": [
     {
@@ -47,7 +47,9 @@
                 {
                   "key": "image",
                   "type": "file",
-                  "src": "test-profile.png"
+                  "src": [
+                    "test-profile.png"
+                  ]
                 }
               ]
             },
@@ -101,7 +103,9 @@
                 {
                   "key": "image",
                   "type": "file",
-                  "src": "test-profile.png"
+                  "src": [
+                    "test-profile.png"
+                  ]
                 }
               ]
             },
@@ -154,7 +158,9 @@
                 {
                   "key": "image",
                   "type": "file",
-                  "src": "test-profile.png"
+                  "src": [
+                    "test-profile.png"
+                  ]
                 }
               ]
             },
@@ -207,7 +213,9 @@
                 {
                   "key": "image",
                   "type": "file",
-                  "src": "test-profile.png"
+                  "src": [
+                    "test-profile.png"
+                  ]
                 }
               ]
             },
