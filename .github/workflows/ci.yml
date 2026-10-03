@@ -3,25 +3,31 @@ name: ProfDrop CI
 on:
   push:
     branches: [main]
+
   pull_request:
     branches: [main]
+
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-
-  build:
-    name: Build ProfDrop
+  build-and-test:
+    name: Build and Test ProfDrop
     runs-on: ubuntu-latest
+
+    env:
+      # Uses Azurite for storage during GitHub Actions
+      AzureWebJobsStorage: UseDevelopmentStorage=true
+      FUNCTIONS_WORKER_RUNTIME: dotnet-isolated
 
     steps:
       # Gets the latest code from the repository
       - name: Checkout repository
         uses: actions/checkout@v7
 
-      # ProfDropFunctions and ProfDropMVC both use .NET 10
+      # Sets up .NET 10
       - name: Set up .NET 10
         uses: actions/setup-dotnet@v6
         with:
@@ -31,6 +37,54 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore ProfDrop.slnx
 
-      # Makes sure both projects compile successfully
+      # Checks that the Functions and MVC projects compile
       - name: Build solution
         run: dotnet build ProfDrop.slnx --configuration Release --no-restore
+
+      # Installs Azurite, Newman and Azure Functions Core Tools
+      - name: Install test tools
+        run: |
+          npm install -g azurite
+          npm install -g newman
+          npm install -g azure-functions-core-tools@4 --unsafe-perm true
+
+      # Starts local Azure Storage
+      - name: Start Azurite
+        run: |
+          mkdir -p /tmp/azurite
+
+          nohup azurite \
+            --silent \
+            --location /tmp/azurite \
+            --debug /tmp/azurite/debug.log \
+            > /tmp/azurite/output.log 2>&1 &
+
+      # Starts the ProfDrop Functions API
+      - name: Start Functions API
+        working-directory: ProfDropFunctions
+        run: |
+          nohup func start --port 7293 \
+            > functions.log 2>&1 &
+
+      # Waits until the API is running
+      - name: Wait for Functions API
+        run: |
+          for i in {1..30}; do
+            if curl --fail --silent http://localhost:7293/api/courses > /dev/null; then
+              echo "ProfDrop API is ready"
+              exit 0
+            fi
+
+            echo "Waiting for ProfDrop API..."
+            sleep 2
+          done
+
+          echo "ProfDrop API failed to start"
+          cat ProfDropFunctions/functions.log
+          exit 1
+
+      # Runs all Postman tests
+      - name: Run Postman tests
+        run: |
+          newman run Postman/ProfDrop.postman_collection.json \
+            --working-dir Postman
