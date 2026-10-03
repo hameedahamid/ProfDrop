@@ -18,13 +18,6 @@ namespace ProfDropFunctions.Models
         public string ProfileUrl { get; set; } = default!;
     }
 
-    public class CreateLecturerRequest
-    {
-        public string Name { get; set; } = default!;
-        public string Email { get; set; } = default!;
-        public string Password { get; set; } = default!;
-    }
-
     public class LoginRequest
     {
         public string Email { get; set; } = default!;

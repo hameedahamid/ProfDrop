@@ -1,4 +1,4 @@
-/* general page styling */
+/* basic page setup */
 
 html {
     font-size: 14px;
@@ -14,15 +14,11 @@ html {
 body {
     min-height: 100vh;
     margin: 0;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
     background-color: #f5f8f8;
     color: #183238;
     font-family: Arial, Helvetica, sans-serif;
-}
-
-main {
-    flex: 1;
 }
 
 .container {
@@ -44,7 +40,17 @@ h5 {
     color: #6d7b7e;
 }
 
-/* navbar */
+/* links */
+
+a {
+    color: #0b5968;
+}
+
+    a:hover {
+        color: #084653;
+    }
+
+/* navbar bits */
 
 .navbar {
     background-color: #ffffff;
@@ -63,9 +69,9 @@ h5 {
     margin-left: 10px;
 }
 
-.nav-link:hover {
-    color: #0b5968;
-}
+    .nav-link:hover {
+        color: #0b5968;
+    }
 
 .nav-divider {
     width: 1px;
@@ -107,23 +113,23 @@ h5 {
     color: #ffffff;
 }
 
-.btn-primary:hover {
-    background-color: #084653;
-    border-color: #084653;
-}
+    .btn-primary:hover {
+        background-color: #084653;
+        border-color: #084653;
+    }
 
 .btn-outline-primary {
     color: #0b5968;
     border-color: #0b5968;
 }
 
-.btn-outline-primary:hover {
-    background-color: #0b5968;
-    border-color: #0b5968;
-    color: #ffffff;
-}
+    .btn-outline-primary:hover {
+        background-color: #0b5968;
+        border-color: #0b5968;
+        color: #ffffff;
+    }
 
-/* form styling */
+/* forms */
 
 .form-label {
     font-weight: 600;
@@ -138,11 +144,11 @@ h5 {
     padding: 12px 14px;
 }
 
-.form-control:focus,
-.form-select:focus {
-    border-color: #0b5968; 
-    box-shadow: 0 0 0 0.2rem rgba(11, 89, 104, 0.15);
-}
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #0b5968;
+        box-shadow: 0 0 0 0.2rem rgba(11, 89, 104, 0.15);
+    }
 
 textarea.form-control {
     min-height: 140px;
@@ -170,16 +176,16 @@ textarea.form-control {
     border: 3px solid #d8ef63;
 }
 
-/* dashboard course cards */
+/* course cards */
 
 .course-card {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.course-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 22px rgba(11, 89, 104, 0.12);
-}
+    .course-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 22px rgba(11, 89, 104, 0.12);
+    }
 
 /* feedback cards */
 
@@ -187,17 +193,7 @@ textarea.form-control {
     border-left: 5px solid #0b5968;
 }
 
-/* links */
-
-a {
-    color: #0b5968;
-}
-
-a:hover {
-    color: #084653;
-}
-
-/* home page */
+/* home page intro */
 
 .home-hero {
     max-width: 850px;
@@ -244,7 +240,7 @@ a:hover {
     margin-bottom: 55px;
 }
 
-/* home page option cards */
+/* student and lecturer cards */
 
 .home-options {
     display: grid;
@@ -284,15 +280,35 @@ a:hover {
     border-top: 5px solid #2e9b62;
 }
 
-/* footer */
+/* footer stays below the page content */
 
 .footer {
-    position: static;
-    bottom: auto;
     width: 100%;
-    margin-top: 40px;
     padding: 8px 0;
     background-color: #ffffff;
     border-top: 1px solid #dce6e8;
-    line-height: normal;
+}
+
+body > footer.footer {
+    position: static !important;
+    bottom: auto !important;
+    margin-top: 0 !important;
+    line-height: normal !important;
+    white-space: normal !important;
+}
+
+/* stack the home cards on small screens */
+
+@media (max-width: 768px) {
+    .home-options {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-title {
+        font-size: 2.6rem;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+    }
 }
