@@ -1,0 +1,36 @@
+name: ProfDrop CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+
+  build:
+    name: Build ProfDrop
+    runs-on: ubuntu-latest
+
+    steps:
+      # Gets the latest code from the repository
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      # ProfDropFunctions and ProfDropMVC both use .NET 10
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+
+      # Downloads the packages needed by both projects
+      - name: Restore dependencies
+        run: dotnet restore ProfDrop.slnx
+
+      # Makes sure both projects compile successfully
+      - name: Build solution
+        run: dotnet build ProfDrop.slnx --configuration Release --no-restore
