@@ -29,8 +29,7 @@ namespace ProfDropMVC.Controllers
                 {
                     // Get all available courses from the ProfDrop API
                     // These courses are displayed in the feedback form for students to select from
-                    Courses = await client.GetFromJsonAsync<List<CourseViewModel>>("courses")
-                        ?? new List<CourseViewModel>()
+                    Courses = await client.GetFromJsonAsync<List<CourseViewModel>>("courses") ?? new List<CourseViewModel>()
                 };
 
                 // Display the feedback form view with the available courses
@@ -59,8 +58,7 @@ namespace ProfDropMVC.Controllers
                     var client = _httpClientFactory.CreateClient("ProfDropApi");
 
                     // // Reload the courses so they are still available in the form when validation fails
-                    model.Courses = await client.GetFromJsonAsync<List<CourseViewModel>>("courses")
-                        ?? new List<CourseViewModel>();
+                    model.Courses = await client.GetFromJsonAsync<List<CourseViewModel>>("courses") ?? new List<CourseViewModel>();
                 }
                 catch
                 {
@@ -98,8 +96,7 @@ namespace ProfDropMVC.Controllers
                     ModelState.AddModelError("", "Unable to submit your feedback.");
 
                     // Reload the courses so that the student can try to submit the feedback again
-                    model.Courses = await client.GetFromJsonAsync<List<CourseViewModel>>("courses")
-                        ?? new List<CourseViewModel>();
+                    model.Courses = await client.GetFromJsonAsync<List<CourseViewModel>>("courses") ?? new List<CourseViewModel>();
 
                     // Return to the feedback form
                     return View(model);
@@ -119,8 +116,7 @@ namespace ProfDropMVC.Controllers
                     var client = _httpClientFactory.CreateClient("ProfDropApi");
 
                     // Reload the available courses for the feedback form
-                    model.Courses = await client.GetFromJsonAsync<List<CourseViewModel>>("courses")
-                        ?? new List<CourseViewModel>();
+                    model.Courses = await client.GetFromJsonAsync<List<CourseViewModel>>("courses") ?? new List<CourseViewModel>();
                 }
                 catch
                 {

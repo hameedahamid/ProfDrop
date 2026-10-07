@@ -384,7 +384,7 @@ public class LecturerFunctions
         var containerClient = blobServiceClient.GetBlobContainerClient(ImageContainer);
 
         // Create the container if it does not already exist.
-        await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
+        await containerClient.CreateIfNotExistsAsync();
 
         // Return the connected container.
         return containerClient;
