@@ -8,6 +8,10 @@ services:
     environment:
       FUNCTIONS_WORKER_RUNTIME: dotnet-isolated
       AzureWebJobsStorage: ${AZURE_STORAGE_CONNECTION_STRING}
+      AzureWebJobsSecretStorageType: files
+      FUNCTIONS_SECRETS_PATH: /azure-functions-host/Secrets
+    volumes:
+      - ./function-secrets:/azure-functions-host/Secrets
 
   web:
     build:
@@ -18,5 +22,6 @@ services:
     environment:
       ASPNETCORE_URLS: http://+:8080
       ProfDropApi__BaseUrl: http://api/api/
+      ProfDropApi__FunctionKey: ${PROFDROP_FUNCTION_KEY}
     depends_on:
       - api
