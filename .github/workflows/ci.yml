@@ -88,3 +88,9 @@ jobs:
         run: |
           newman run Postman/ProfDrop.postman_collection.json \
             --working-dir Postman
+      # Checks that both Docker images build successfully
+      - name: Build Docker Compose images
+        env:
+          AZURE_STORAGE_CONNECTION_STRING: UseDevelopmentStorage=true
+          PROFDROP_FUNCTION_KEY: ci-test-key
+        run: docker compose build
