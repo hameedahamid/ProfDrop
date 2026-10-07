@@ -12,6 +12,7 @@ namespace ProfDropFunctions.Models
         public string RowKey { get; set; } = default!;
         public DateTimeOffset? Timestamp { get; set; } = default!;
         public ETag ETag { get; set; } = default!;
+
         public string Name { get; set; } = default!;
         public string Email { get; set; } = default!;
         public string PasswordHash { get; set; } = default!;

@@ -4,18 +4,16 @@
     ViewData["Title"] = "Lecturer Dashboard";
 }
 
-@* Display the lecturer's profile details *@
+@* Display the lecturer's profile details. *@
 <div class="lecturer-profile mb-4">
 
-    @* Show the lecturer's profile image if one exists *@
+    @* Show the lecturer's profile image if one exists. *@
     @if (!string.IsNullOrWhiteSpace(Model.ProfileUrl))
     {
-        <img src="@Model.ProfileUrl"
-             alt="@Model.Name"
-             class="lecturer-dashboard-photo" />
+        <img src="@Model.ProfileUrl" alt="@Model.Name" class="lecturer-dashboard-photo" />
     }
 
-    @* Show the lecturer's name, email and dashboard message *@
+    @* Show the lecturer's name, email and dashboard message. *@
     <div>
         <h1 class="mb-1">Welcome, @Model.Name 👋</h1>
 
@@ -23,20 +21,18 @@
             @Model.Email
         </small>
 
-        <p class="text-muted mt-2 mb-0">
-            View the feedback submitted for your courses.
-        </p>
+        <p class="text-muted mt-2 mb-0">View the feedback submitted for your courses.</p>
     </div>
 </div>
 
 
-@* Display any validation or loading errors *@
+@* Display any validation or loading errors. *@
 <div asp-validation-summary="All"
      class="text-danger mb-3">
 </div>
 
 
-@* Show a message when the lecturer has no assigned courses *@
+@* Show a message when the lecturer has no assigned courses. *@
 @if (Model.Courses.Count == 0)
 {
     <div class="alert alert-light border">
@@ -45,10 +41,10 @@
 }
 else
 {
-    @* Display all courses assigned to the lecturer *@
+    @* Display all courses assigned to the lecturer. *@
     <div class="row">
 
-        @* Create one card for each course *@
+        @* Create one card for each course. *@
         @foreach (var course in Model.Courses)
         {
             <div class="col-md-6 col-lg-4 mb-4">
@@ -57,25 +53,21 @@ else
 
                     <div class="card-body">
 
-                        @* Display the course code *@
+                        @* Display the course code. *@
                         <h4>
                             @course.CourseCode
                         </h4>
 
-                        @* Display the course name *@
+                        @* Display the course name. *@
                         <p class="text-muted">
                             @course.CourseName
                         </p>
 
-                        @* Open the feedback page for this course *@
+                        @* Open the feedback page for this course. *@
                         <a asp-controller="Lecturer" asp-action="Feedback" asp-route-courseCode="@course.CourseCode" class="btn btn-primary">View Feedback</a>
-
                     </div>
-
                 </div>
-
             </div>
         }
-
     </div>
 }

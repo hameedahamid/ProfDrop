@@ -1,6 +1,6 @@
 ﻿namespace ProfDropMVC.Models
 {
-    // This will help create the authentication cookie to know which lecturer is logged in
+    // Holds lecturer details returned by the API for use in the MVC application.
     public class LecturerViewModel
     {
         public string Name { get; set; } = default!;

@@ -25,14 +25,16 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Feedback" asp-action="Index">Give Feedback</a>
                         </li>
+                        @* Show the dashboard link only when a lecturer is signed in. *@
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Lecturer" asp-action="Dashboard">Dashboard</a>
                             </li>
                         }
-                    </ul>
-                    <ul class="navbar-nav align-items-center">
+                        </ul>
+                        <ul class="navbar-nav align-items-center">
+                            @* Signed-in lecturers can see their name and the option to log out. *@
                             @if (User.Identity != null && User.Identity.IsAuthenticated)
                             {
                                 <li class="nav-item">
@@ -40,6 +42,7 @@
                                 </li>
                                 <li class="nav-divider"></li>
                                 <li class="nav-item">
+                                    @* Submit a POST request to sign the lecturer out. *@
                                     <form asp-controller="Account" asp-action="Logout" method="post">
                                         <button type="submit" class="nav-link btn btn-link">Logout</button>
                                     </form>
@@ -47,6 +50,7 @@
                             }
                             else
                             {
+                               @* Show the login link to users who are not signed in. *@
                                 <li class="nav-item">
                                     <a class="nav-link" asp-controller="Account" asp-action="Login">Lecturer Login</a>
                                 </li>

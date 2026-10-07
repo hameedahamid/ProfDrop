@@ -20,28 +20,30 @@ namespace ProfDropMVC.Controllers
         }
 
 
-        // Display the lecturer login page.
+        // Display the login form. This action is available to everyone, including users who are not signed in.
         [AllowAnonymous]
         [HttpGet]
         public IActionResult Login()
         {
-            // Send logged-in lecturers straight to their dashboard.
+            // If a lecturer is already signed in, send them to their dashboard instead of showing the login form.
             if (User.Identity?.IsAuthenticated == true)
             {
                 return RedirectToAction("Dashboard", "Lecturer");
             }
 
+            // Create an empty view model for the login form.
             return View(new LoginViewModel());
         }
 
 
-        // Check the lecturer's login details and create the authentication cookie.
+        // Process the submitted login form. If the credentials are valid, sign the lecturer in.
         [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            // Return the form if validation fails.
+            // Check that the submitted email and password meet the view model's validation rules.
+            // If they do not, show the form again with the validation errors.
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -51,14 +53,14 @@ namespace ProfDropMVC.Controllers
             {
                 var client = _httpClientFactory.CreateClient("ProfDropApi");
 
-                // Send the email and password to the Azure Function.
+                // Send the lecturer's email and password to the API so it can check their login details.
                 var response = await client.PostAsJsonAsync("lecturers/login", new
                 {
                     email = model.Email,
                     password = model.Password
                 });
 
-                // Show a simple message when the login details are incorrect.
+                // If the API rejects the credentials, show an error on the login form.
                 if (response.StatusCode == HttpStatusCode.Unauthorized)
                 {
                     ModelState.AddModelError("", "Incorrect email or password.");
@@ -72,16 +74,18 @@ namespace ProfDropMVC.Controllers
                     return View(model);
                 }
 
-                // Get the lecturer details returned by the API.
+                // Read the lecturer's details returned by the API after a successful login.
                 var lecturer = await response.Content.ReadFromJsonAsync<LecturerViewModel>();
 
+                // Make sure the API returned a lecturer with an email before continuing.
                 if (lecturer == null || string.IsNullOrWhiteSpace(lecturer.Email))
                 {
                     ModelState.AddModelError("", "Unable to complete login.");
                     return View(model);
                 }
 
-                // Store the lecturer's details in secure authentication claims.
+                // Add the lecturer's details to claims, which are stored in their authentication cookie.
+                // The claims can be used by the MVC app to identify the lecturer and display their profile.
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.NameIdentifier,lecturer.Email),
@@ -90,23 +94,28 @@ namespace ProfDropMVC.Controllers
                     new Claim("ProfileUrl",lecturer.ProfileUrl ?? "")
                 };
 
-                // Create the lecturer's authentication identity.
+                // Create an identity and user principal from the lecturer's claims.
+                // These identify the lecturer as signed in to the MVC application.
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+               
                 var principal = new ClaimsPrincipal(identity);
 
-                // Sign the lecturer in using a non-persistent cookie.
+                // Create a session cookie for the lecturer. IsPersistent = false means the cookie is not set to remain after the browser is closed.
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, new AuthenticationProperties
                 {
                     IsPersistent = false
                 });
 
+                // Send the signed-in lecturer to their dashboard.
                 return RedirectToAction("Dashboard", "Lecturer");
             }
+            // Show an error if the MVC application cannot connect to the Functions API.
             catch (HttpRequestException)
             {
                 ModelState.AddModelError("", "Unable to connect to the login service.");
                 return View(model);
             }
+            // Show an error if the login request takes too long and times out.
             catch (TaskCanceledException)
             {
                 ModelState.AddModelError("", "The login request timed out.");

@@ -1,5 +1,6 @@
 ﻿namespace ProfDropMVC.Models
 {
+    // Holds course and lecturer details used by the MVC views.
     public class CourseViewModel
     {
         public string CourseCode { get; set; } = default!;

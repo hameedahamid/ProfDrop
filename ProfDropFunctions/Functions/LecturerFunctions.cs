@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
-using Microsoft.Azure.Functions.Worker.Extensions.Tables;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 using ProfDropFunctions.Models;
@@ -207,51 +206,38 @@ public class LecturerFunctions
             }
 
             // Connect to the lecturer image Blob container.
-            var containerClient =
-                await GetLecturerImageContainerAsync();
-
+            var containerClient = await GetLecturerImageContainerAsync();
 
             // Create a unique file name for the image.
-            string blobName =
-                $"{email}/{Guid.NewGuid()}{imageExtension}";
-
+            string blobName = $"{email}/{Guid.NewGuid()}{imageExtension}";
 
             // Get a reference to the new image in Blob Storage.
-            var blobClient =
-                containerClient.GetBlobClient(blobName);
-
+            var blobClient = containerClient.GetBlobClient(blobName);
 
             // Move the image stream back to the beginning.
             imageStream.Position = 0;
 
-
             // Upload the image to Blob Storage.
-            await blobClient.UploadAsync(
-                imageStream,
-                new BlobUploadOptions
+            await blobClient.UploadAsync(imageStream, new BlobUploadOptions
+            {
+                // Save the correct image type.
+                HttpHeaders = new BlobHttpHeaders
                 {
-                    // Save the correct image type.
-                    HttpHeaders = new BlobHttpHeaders
-                    {
-                        ContentType = imageContentType
-                    }
-                });
+                    ContentType = imageContentType
+                }
+            });
 
             // Create the new lecturer record.
             var lecturer = new Lecturer
             {
                 // All lecturers use the same partition.
                 PartitionKey = LecturerPartition,
-
                 // Use the lecturer's email as their unique RowKey.
                 RowKey = email,
-
                 // Save their name.
                 Name = name,
-
                 // Save their email.
                 Email = email,
-
                 // Save the Blob Storage image URL.
                 ProfileUrl = blobClient.Uri.ToString()
             };
@@ -273,13 +259,10 @@ public class LecturerFunctions
             {
                 // Return a success message.
                 message = "Lecturer created successfully.",
-
                 // Return the lecturer name.
                 name = lecturer.Name,
-
                 // Return the lecturer email.
                 email = lecturer.Email,
-
                 profileUrl = lecturer.ProfileUrl
             });
 
