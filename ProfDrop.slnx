@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="docker-compose.yml" />
+  </Folder>
   <Project Path="ProfDropFunctions/ProfDropFunctions.csproj" />
   <Project Path="ProfDropMVC/ProfDropMVC.csproj" />
 </Solution>

@@ -32,9 +32,16 @@ namespace ProfDropMVC
             // Register a named HTTP client for requests from the MVC app to the ProfDrop Functions API.
             builder.Services.AddHttpClient("ProfDropApi", client =>
             {
-                // Set the API's base address from configuration.
-                // Stop the application from starting if the address is missing.
                 client.BaseAddress = new Uri(builder.Configuration["ProfDropApi:BaseUrl"] ?? throw new InvalidOperationException("ProfDropApi:BaseUrl is missing."));
+
+                // Read the Function key from the app's configuration.
+                var functionKey = builder.Configuration["ProfDropApi:FunctionKey"];
+
+                // Add the key to API requests when it has been provided.
+                if (!string.IsNullOrWhiteSpace(functionKey))
+                {
+                    client.DefaultRequestHeaders.Add("x-functions-key", functionKey);
+                }
             });
 
             var app = builder.Build();
