@@ -5,34 +5,27 @@
 <div class="container mt-5 mb-5">
     <div class="row justify-content-center">
         <div class="col-md-7 col-lg-6">
-
+            @* Display a centred confirmation card after the feedback is submitted. *@
             <div class="card success-card border-0 shadow-sm text-center">
                 <div class="card-body p-5">
+
+                    @* Show a tick to indicate that the submission was successful. *@
                     <div class="success-tick">✓</div>
-                    @* Confirm that the feedback was submitted successfully *@
+
+                    @* Confirm that the feedback was submitted successfully. *@
                     <h1 class="mb-3">Feedback Submitted</h1>
 
                     <p class="text-muted mb-4">
                         Thank you for your feedback. Your response has been submitted anonymously.
                     </p>
 
-                    @* Allow the student to submit another response *@
-                    <a asp-controller="Feedback"
-                       asp-action="Index"
-                       class="btn btn-primary">
-                        Submit More Feedback
-                    </a>
+                    @* Let the student return to the feedback form to submit another response. *@
+                    <a asp-controller="Feedback" asp-action="Index" class="btn btn-primary">Submit More Feedback</a>
 
                     @* Return the student to the home page *@
-                    <a asp-controller="Home"
-                       asp-action="Index"
-                       class="btn btn-outline-secondary ms-2">
-                        Back to Home
-                    </a>
-
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary ms-2">Back to Home</a>
                 </div>
             </div>
-
         </div>
     </div>
 </div>

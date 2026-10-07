@@ -32,8 +32,7 @@ namespace ProfDropFunctions.Functions
 
         // POST endpoint used by students to submit anonymous feedback
         [Function("CreateFeedback")]
-        public async Task<HttpResponseData> CreateFeedback(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "feedback")] HttpRequestData req,
+        public async Task<HttpResponseData> CreateFeedback([HttpTrigger(AuthorizationLevel.Function, "post", Route = "feedback")] HttpRequestData req,
             [TableInput(FeedbackTableName, Connection = "AzureWebJobsStorage")] TableClient feedbackTableClient,
             [TableInput(CourseTableName, Connection = "AzureWebJobsStorage")] TableClient courseTableClient)
         {
@@ -45,25 +44,34 @@ namespace ProfDropFunctions.Functions
                 await courseTableClient.CreateIfNotExistsAsync();
 
                 // Read the JSON request body and convert it into a CreateFeedbackRequest object
-                var data = await JsonSerializer.DeserializeAsync<CreateFeedbackRequest>(
-                    req.Body,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                var data = await JsonSerializer.DeserializeAsync<CreateFeedbackRequest>(req.Body, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
                 // Check that the request body was valid and could be read
                 if (data == null)
+                {
                     return await BadRequest(req, "Invalid request body.");
+                }
 
                 // Check that the student selected a course
                 if (string.IsNullOrWhiteSpace(data.CourseCode))
+                {
                     return await BadRequest(req, "Course code is required.");
+                }
 
                 // Check that the student selected a feedback category
                 if (string.IsNullOrWhiteSpace(data.Category))
+                {
                     return await BadRequest(req, "Feedback category is required.");
+                }
 
                 // Check that the student entered a feedback message
                 if (string.IsNullOrWhiteSpace(data.Message))
+                {
+
+
                     return await BadRequest(req, "Feedback message is required.");
+                }
+
 
                 // Clean the course code, category and feedback message
                 string courseCode = data.CourseCode.Trim().ToUpper();
@@ -72,30 +80,43 @@ namespace ProfDropFunctions.Functions
 
                 // Prevent students from submitting feedback longer than 2000 characters
                 if (message.Length > 2000)
+                {
+
                     return await BadRequest(req, "Feedback message must be 2000 characters or less.");
+                }
 
                 // Convert the selected category to the standard category name used by the system
                 if (category.Equals("explanation", StringComparison.OrdinalIgnoreCase))
+                {
                     category = "Explanation";
+                }
                 else if (category.Equals("lecture pace", StringComparison.OrdinalIgnoreCase))
+                {
                     category = "Lecture Pace";
+                }
                 else if (category.Equals("course material", StringComparison.OrdinalIgnoreCase))
+                {
                     category = "Course Material";
+                }
                 else if (category.Equals("assessment", StringComparison.OrdinalIgnoreCase))
+                {
                     category = "Assessment";
+                }
                 else if (category.Equals("other", StringComparison.OrdinalIgnoreCase))
+                {
                     category = "Other";
+                }
                 else
                     return await BadRequest(req, "Invalid feedback category. Use Lecture Pace, Explanation, Course Material, Assessment or Other.");
 
                 // Check that the selected course exists before saving the feedback
-                var courseResult = await courseTableClient.GetEntityIfExistsAsync<Course>(
-                    CoursePartition,
-                    courseCode);
+                var courseResult = await courseTableClient.GetEntityIfExistsAsync<Course>(CoursePartition, courseCode);
 
                 // Return 404 if the selected course does not exist
                 if (!courseResult.HasValue)
+                {
                     return await NotFound(req, "The course was not found.");
+                }
 
                 // Generate a unique ID for this anonymous feedback entry
                 string feedbackId = Guid.NewGuid().ToString();
@@ -147,6 +168,7 @@ namespace ProfDropFunctions.Functions
             {
                 // Record the unexpected error in the function logs for debugging purposes
                 _logger.LogError(ex, "Error creating feedback.");
+
                 // Return a 500 Internal Server Error to the client 
                 return await InternalServerError(req, "An error occurred while submitting feedback.");
             }
@@ -154,10 +176,7 @@ namespace ProfDropFunctions.Functions
 
         // GET endpoint used by a lecturer to view feedback for one of their courses
         [Function("GetCourseFeedback")]
-        public async Task<HttpResponseData> GetCourseFeedback(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "lecturers/{email}/courses/{code}/feedback")] HttpRequestData req,
-            string email,
-            string code,
+        public async Task<HttpResponseData> GetCourseFeedback([HttpTrigger(AuthorizationLevel.Function, "get", Route = "lecturers/{email}/courses/{code}/feedback")] HttpRequestData req, string email, string code,
             [TableInput(FeedbackTableName, Connection = "AzureWebJobsStorage")] TableClient feedbackTableClient,
             [TableInput(CourseTableName, Connection = "AzureWebJobsStorage")] TableClient courseTableClient)
         {
@@ -173,20 +192,22 @@ namespace ProfDropFunctions.Functions
                 string courseCode = code.Trim().ToUpper();
 
                 // Check that the requested course exists
-                var courseResult = await courseTableClient.GetEntityIfExistsAsync<Course>(
-                    CoursePartition,
-                    courseCode);
+                var courseResult = await courseTableClient.GetEntityIfExistsAsync<Course>(CoursePartition, courseCode);
 
                 // Return 404 if the requested course does not exist
                 if (!courseResult.HasValue)
+                {
                     return await NotFound(req, "The course was not found.");
+                }
 
                 // Get the course that was found 
                 var course = courseResult.Value;
 
                 // Make sure the lecturer requesting the feedback owns this course
                 if (!course.LecturerEmail.Equals(lecturerEmail, StringComparison.OrdinalIgnoreCase))
+                {
                     return await Forbidden(req, "You do not have access to this course's feedback.");
+                }
 
                 // Store the selected category filter
                 string category = string.Empty;
@@ -196,23 +217,37 @@ namespace ProfDropFunctions.Functions
 
                 // Check whether the lecturer selected a category filter in the query string
                 if (query.TryGetValue("category", out var categoryValue))
+                {
                     category = categoryValue.ToString().Trim();
+                }
 
                 // Validate and standardize the selected category
                 if (!string.IsNullOrWhiteSpace(category))
                 {
                     if (category.Equals("explanation", StringComparison.OrdinalIgnoreCase))
+                    {
                         category = "Explanation";
+                    }
                     else if (category.Equals("lecture pace", StringComparison.OrdinalIgnoreCase))
+                    {
                         category = "Lecture Pace";
+                    }
                     else if (category.Equals("course material", StringComparison.OrdinalIgnoreCase))
+                    {
                         category = "Course Material";
+                    }
                     else if (category.Equals("assessment", StringComparison.OrdinalIgnoreCase))
+                    {
                         category = "Assessment";
+                    }
                     else if (category.Equals("other", StringComparison.OrdinalIgnoreCase))
+                    {
                         category = "Other";
+                    }
                     else
+                    {
                         return await BadRequest(req, "Invalid feedback category.");
+                    }
                 }
 
                 // Create a list to hold the feedback that will be returned to the lecturer
@@ -224,7 +259,9 @@ namespace ProfDropFunctions.Functions
                     // If no category was selected, add all feedback for the course
                     // If a category was selected, only add feedback that matches the selected category
                     if (string.IsNullOrWhiteSpace(category) || feedback.Category == category)
+                    {
                         feedbackList.Add(feedback);
+                    }
                 }
 
                 // Sort the feedback so that the newest feedback appears first in the list returned to the lecturer
@@ -250,6 +287,7 @@ namespace ProfDropFunctions.Functions
 
                 // Send the feedback list back to the MVC application as JSON
                 await response.WriteAsJsonAsync(feedbackResults);
+
                 // Return the successful response
                 return response;
             }
@@ -257,6 +295,7 @@ namespace ProfDropFunctions.Functions
             {
                 // Record the unexpected error in the function logs for debugging purposes
                 _logger.LogError(ex, "Error getting course feedback.");
+
                 return await InternalServerError(req, "An error occurred while getting course feedback.");
             }
         }

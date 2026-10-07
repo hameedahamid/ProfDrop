@@ -2,6 +2,7 @@
 ViewData["Title"] = "Home";
 }
 
+ @* Introduce ProfDrop. *@
 <div class="home-hero">
     <div class="hero-badge">
         Anonymous Lecturer Feedback
@@ -20,10 +21,12 @@ ViewData["Title"] = "Home";
         in a simple and anonymous way.
     </p>
 
+     @* Provide the main actions available from the home page. *@
     <div class="hero-buttons">
 
         <a asp-controller="Feedback" asp-action="Index" class="btn btn-primary">Give Feedback</a>
 
+         @* Show the dashboard link to signed-in lecturers, or the login to users. *@
         @if (User.Identity != null && User.Identity.IsAuthenticated)
         {
             <a asp-controller="Lecturer" asp-action="Dashboard" class="btn btn-outline-primary">Lecturer Dashboard</a>
@@ -35,6 +38,7 @@ ViewData["Title"] = "Home";
 
     </div>
 
+    @* Summarise the features available to students and lecturers. *@
     <div class="home-options">
         <div class="home-option-card">
             <div class="option-icon">🎓</div>

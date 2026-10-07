@@ -1,6 +1,5 @@
 ﻿using Azure.Data.Tables;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.Azure.Functions.Worker.Extensions.Tables;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using ProfDropFunctions.Models;
@@ -31,8 +30,7 @@ namespace ProfDropFunctions.Functions
 
         // POST endpoint used to create a new course
         [Function("CreateCourse")]
-        public async Task<HttpResponseData> CreateCourse(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "courses")] HttpRequestData req,
+        public async Task<HttpResponseData> CreateCourse([HttpTrigger(AuthorizationLevel.Function, "post", Route = "courses")] HttpRequestData req,
             [TableInput(CourseTableName, Connection = "AzureWebJobsStorage")] TableClient courseTableClient,
             [TableInput(LecturerTableName, Connection = "AzureWebJobsStorage")] TableClient lecturerTableClient)
         {
@@ -44,51 +42,60 @@ namespace ProfDropFunctions.Functions
                 await lecturerTableClient.CreateIfNotExistsAsync();
 
                 // Read the JSON request body and convert it into a CreateCourseRequest object
-                var data = await JsonSerializer.DeserializeAsync<CreateCourseRequest>(
-                    req.Body,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                var data = await JsonSerializer.DeserializeAsync<CreateCourseRequest>(req.Body, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
                 // Check that the request body was valid 
                 if (data == null)
+                {
                     return await BadRequest(req, "Invalid request body.");
+                }
 
                 // Check that a course code was provided 
                 if (string.IsNullOrWhiteSpace(data.CourseCode))
+                {
                     return await BadRequest(req, "Course code is required.");
+                }
 
                 // Check that a course name was provided
                 if (string.IsNullOrWhiteSpace(data.Name))
+                {
                     return await BadRequest(req, "Course name is required.");
-                
+                }
+
                 // Check that the lecturer email was provided
                 if (string.IsNullOrWhiteSpace(data.LecturerEmail))
+                {
+
                     return await BadRequest(req, "Lecturer email is required.");
+                }
 
                 // Clean the course code and convert it to uppercase 
                 string courseCode = data.CourseCode.Trim().ToUpper();
+
                 // Remove unnecessary spaces from the course name
                 string courseName = data.Name.Trim();
+
                 // The Lecturer table uses the lecturer's email as the RowKey,
                 // Therefore, LecturerEmail contains the lecturer's email in this system
                 string lecturerEmail = data.LecturerEmail.Trim().ToLower();
 
                 // Check that the lecturer exists using their email as the RowKey
-                var lecturerResult = await lecturerTableClient.GetEntityIfExistsAsync<Lecturer>(
-                    LecturerPartition,
-                    lecturerEmail);
+                var lecturerResult = await lecturerTableClient.GetEntityIfExistsAsync<Lecturer>(LecturerPartition, lecturerEmail);
 
                 // Return a 404 Not Found response if the lecturer does not exist
                 if (!lecturerResult.HasValue)
+                {
                     return await NotFound(req, "The lecturer with this email was not found.");
+                }
 
                 // Check whether a course with this course code already exists 
-                var existingCourse = await courseTableClient.GetEntityIfExistsAsync<Course>(
-                    CoursePartition,
-                    courseCode);
+                var existingCourse = await courseTableClient.GetEntityIfExistsAsync<Course>(CoursePartition, courseCode);
 
                 // Do not allow two courses to use the same course code , return a 409 Conflict response if they do
                 if (existingCourse.HasValue)
+                {
                     return await Conflict(req, "A course with this course code already exists.");
+                }
 
                 // Create the new course record
                 var course = new Course
@@ -131,6 +138,7 @@ namespace ProfDropFunctions.Functions
             {
                 // Record the unexpected error in the Function logs
                 _logger.LogError(ex, "Error creating course.");
+
                 // Return a 500 Internal Server Error
                 return await InternalServerError(req, "An error occurred while creating the course.");
             }
@@ -138,8 +146,7 @@ namespace ProfDropFunctions.Functions
 
         // GET endpoint used to display all courses on the student side
         [Function("GetCourses")]
-        public async Task<HttpResponseData> GetCourses(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "courses")] HttpRequestData req,
+        public async Task<HttpResponseData> GetCourses([HttpTrigger(AuthorizationLevel.Function, "get", Route = "courses")] HttpRequestData req,
             [TableInput(CourseTableName, Connection = "AzureWebJobsStorage")] TableClient courseTableClient,
             [TableInput(LecturerTableName, Connection = "AzureWebJobsStorage")] TableClient lecturerTableClient)
         {
@@ -157,9 +164,7 @@ namespace ProfDropFunctions.Functions
                 await foreach (Course course in courseTableClient.QueryAsync<Course>(x => x.PartitionKey == CoursePartition))
                 {
                     // Use the lecturer email stored in the course to find the matching lecturer
-                    var lecturerResult = await lecturerTableClient.GetEntityIfExistsAsync<Lecturer>(
-                        LecturerPartition,
-                        course.LecturerEmail);
+                    var lecturerResult = await lecturerTableClient.GetEntityIfExistsAsync<Lecturer>(LecturerPartition, course.LecturerEmail);
 
                     // Only return the course if its lecturer still exists
                     if (lecturerResult.HasValue)
@@ -186,6 +191,7 @@ namespace ProfDropFunctions.Functions
 
                 // Create a successful 200 OK response
                 var response = req.CreateResponse(HttpStatusCode.OK);
+
                 // Return the list of courses as JSON
                 await response.WriteAsJsonAsync(courses);
 
@@ -196,6 +202,7 @@ namespace ProfDropFunctions.Functions
             {
                 // Record the unexpected error in the Function logs
                 _logger.LogError(ex, "Error getting courses.");
+
                 // Return a 500 Internal Server Error
                 return await InternalServerError(req, "An error occurred while getting courses.");
             }
@@ -203,9 +210,7 @@ namespace ProfDropFunctions.Functions
 
         // GET endpoint used to get the details of one course using its course code
         [Function("GetCourse")]
-        public async Task<HttpResponseData> GetCourse(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "courses/{courseCode}")] HttpRequestData req,
-            string courseCode,
+        public async Task<HttpResponseData> GetCourse([HttpTrigger(AuthorizationLevel.Function, "get", Route = "courses/{courseCode}")] HttpRequestData req, string courseCode,
             [TableInput(CourseTableName, Connection = "AzureWebJobsStorage")] TableClient courseTableClient,
             [TableInput(LecturerTableName, Connection = "AzureWebJobsStorage")] TableClient lecturerTableClient)
         {
@@ -220,27 +225,29 @@ namespace ProfDropFunctions.Functions
                 courseCode = courseCode.Trim().ToUpper();
 
                 // Find the course using the COURSE partition and course code as the RowKey
-                var courseResult = await courseTableClient.GetEntityIfExistsAsync<Course>(
-                    CoursePartition,
-                    courseCode);
+                var courseResult = await courseTableClient.GetEntityIfExistsAsync<Course>(CoursePartition, courseCode);
 
                 // Return a 404 Not Found response if the course does not exist
                 if (!courseResult.HasValue)
+                {
                     return await NotFound(req, "Course was not found.");
+                }
 
                 // Get the course that was found
                 var course = courseResult.Value;
 
                 // Use the lecturer email stored in the course to find the lecturer assigned to this course
-                var lecturerResult = await lecturerTableClient.GetEntityIfExistsAsync<Lecturer>(
-                    LecturerPartition,
-                    course.LecturerEmail);
+                var lecturerResult = await lecturerTableClient.GetEntityIfExistsAsync<Lecturer>(LecturerPartition, course.LecturerEmail);
 
                 // Return a 404 Not Found response if the lecturer assigned to this course cannot be found
                 if (!lecturerResult.HasValue)
+                {
                     return await NotFound(req, "The lecturer assigned to this course was not found.");
+                }
+
                 // Get the lecturer information  
                 var lecturer = lecturerResult.Value;
+
                 // Create a successful 200 OK response
                 var response = req.CreateResponse(HttpStatusCode.OK);
 
@@ -266,6 +273,7 @@ namespace ProfDropFunctions.Functions
             {
                 // Record the unexpected error in the Function logs
                 _logger.LogError(ex, "Error getting course.");
+
                 // Return a 500 Internal Server Error
                 return await InternalServerError(req, "An error occurred while getting the course.");
             }
@@ -273,9 +281,7 @@ namespace ProfDropFunctions.Functions
 
         // GET endpoint used to get all courses belonging to a specific lecturer
         [Function("GetLecturerCourses")]
-        public async Task<HttpResponseData> GetLecturerCourses(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "lecturers/{email}/courses")] HttpRequestData req,
-            string email,
+        public async Task<HttpResponseData> GetLecturerCourses([HttpTrigger(AuthorizationLevel.Function, "get", Route = "lecturers/{email}/courses")] HttpRequestData req, string email,
             [TableInput(CourseTableName, Connection = "AzureWebJobsStorage")] TableClient courseTableClient)
         {
             try
@@ -306,8 +312,10 @@ namespace ProfDropFunctions.Functions
 
                 // Create a successful 200 OK response
                 var response = req.CreateResponse(HttpStatusCode.OK);
+
                 // Return the lecturer's courses as JSON
                 await response.WriteAsJsonAsync(courses);
+
                 // Send the response back to the client
                 return response;
             }
@@ -315,6 +323,7 @@ namespace ProfDropFunctions.Functions
             {
                 // Record the unexpected error in the Function logs
                 _logger.LogError(ex, "Error getting lecturer courses.");
+
                 // Return a 500 Internal Server Error
                 return await InternalServerError(req, "An error occurred while getting lecturer courses.");
             }

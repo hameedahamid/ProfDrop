@@ -2,16 +2,19 @@
 
 namespace ProfDropMVC.Models
 {
+    // Holds the email and password submitted through the lecturer login form.
     public class LoginViewModel
     {
+        // The lecturer must enter an email address.
+        // It cannot be left blank, must have a valid email format, and can contain up to 100 characters.
         [Required]
-        // Validates email address
         [EmailAddress]
         [StringLength(100)]
         public string Email { get; set; } = default!;
 
+        // The lecturer must enter a password.
+        // It cannot be left blank, is treated as password data by the form, and can contain up to 128 characters.
         [Required]
-        // Tells .NET that this property contains a password
         [DataType(DataType.Password)]
         [StringLength(128)]
         public string Password { get; set; } = default!;

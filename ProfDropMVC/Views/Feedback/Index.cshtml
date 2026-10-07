@@ -8,6 +8,7 @@
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-7">
 
+             @* Introduce the feedback form. *@
             <div class="mb-4">
                 <h1>Submit Feedback</h1>
                 <p class="text-muted">
@@ -15,23 +16,24 @@
                 </p>
             </div>
 
+             @* Display validation messages if any form fields are invalid. *@
             <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
 
+                     @* Submit the student's feedback to the Feedback controller. *@
                     <form asp-controller="Feedback" asp-action="Index" method="post">
 
-                        @* Select the course *@
+                         @* Let the student choose a course and show its lecturer's details. *@
                         <div class="mb-3">
                             <label asp-for="CourseCode" class="form-label">Course</label>
 
-                            <select asp-for="CourseCode"
-                                    class="form-select"
-                                    id="courseSelect">
+                            <select asp-for="CourseCode" class="form-select" id="courseSelect">
 
                                 <option value="">-- Select a course --</option>
 
+                                @* Add each available course and store its lecturer details for the script. *@
                                 @foreach (var course in Model.Courses)
                                 {
                                     <option value="@course.CourseCode"
@@ -41,39 +43,28 @@
                                         @course.CourseCode - @course.CourseName
                                     </option>
                                 }
-
                             </select>
 
-                            <span asp-validation-for="CourseCode"
-                                  class="text-danger"></span>
+                             @* Show a validation message if the student has not selected a course. *@
+                            <span asp-validation-for="CourseCode" class="text-danger"></span>
 
-                            @* Selected lecturer *@
+                            @* This section is filled in and shown after a course is selected. *@
                             <div id="lecturerSection"
                                  class="align-items-center gap-3 mt-3 d-none">
 
-                                <img id="lecturerPhoto"
-                                     alt="Lecturer"
-                                     class="rounded-circle"
-                                     width="65"
-                                     height="65"
-                                     style="object-fit: cover;" />
+                                <img id="lecturerPhoto" alt="Lecturer" class="rounded-circle" width="65" height="65" style="object-fit: cover;" />
 
                                 <div>
                                     <small class="text-muted">Lecturer</small>
                                     <h5 id="lecturerName" class="mb-0"></h5>
-                                    <small id="lecturerEmail"
-                                           class="text-muted"></small>
+                                    <small id="lecturerEmail" class="text-muted"></small>
                                 </div>
-
                             </div>
                         </div>
 
-                        @* Select the feedback category *@
+                         @* Let the student choose the category that best describes their feedback. *@
                         <div class="mb-3">
-                            <label asp-for="Category"
-                                   class="form-label">
-                                Feedback Category
-                            </label>
+                            <label asp-for="Category" class="form-label">Feedback Category</label>
 
                             <select asp-for="Category" class="form-select">
                                 <option value="">-- Select a category --</option>
@@ -84,29 +75,18 @@
                                 <option value="Other">Other</option>
                             </select>
 
-                            <span asp-validation-for="Category"
-                                  class="text-danger"></span>
+                            @* Show a validation message if the student has not selected a category. *@
+                            <span asp-validation-for="Category" class="text-danger"></span>
                         </div>
 
-                        @* Enter the feedback *@
+                         @* Let the student enter feedback, with a limit of 2,000 characters. *@
                         <div class="mb-3">
-                            <label asp-for="Message"
-                                   class="form-label">
-                                Your Feedback
-                            </label>
+                            <label asp-for="Message" class="form-label">Your Feedback</label>
 
-                            <textarea asp-for="Message"
-                                      class="form-control"
-                                      rows="6"
-                                      maxlength="2000"
-                                      placeholder="Enter your feedback here..."></textarea>
-
-                            <span asp-validation-for="Message"
-                                  class="text-danger"></span>
-
-                            <small class="text-muted">
-                                Maximum 2000 characters.
-                            </small>
+                            @* Show a validation message if the feedback is missing or too long. *@
+                            <textarea asp-for="Message" class="form-control" rows="6" maxlength="2000" placeholder="Enter your feedback here..."></textarea>
+                            <span asp-validation-for="Message" class="text-danger"></span>
+                            <small class="text-muted">Maximum 2000 characters.</small>
                         </div>
 
                         @* Anonymous feedback message *@
@@ -118,47 +98,44 @@
                             </p>
                         </div>
 
-                        <button type="submit"
-                                class="btn btn-primary w-100">
-                            Submit Feedback
-                        </button>
-
+                         @* Submit the completed feedback form. *@
+                        <button type="submit" class="btn btn-primary w-100">Submit Feedback</button>
                     </form>
-
                 </div>
             </div>
-
         </div>
     </div>
 </div>
 
 @section Scripts {
+    @* Load the scripts that provide client-side form validation. *@
     <partial name="_ValidationScriptsPartial" />
 
     <script>
+        // Get the course dropdown and the elements that display lecturer details.
         const courseSelect = document.getElementById("courseSelect");
         const lecturerSection = document.getElementById("lecturerSection");
         const lecturerPhoto = document.getElementById("lecturerPhoto");
         const lecturerName = document.getElementById("lecturerName");
         const lecturerEmail = document.getElementById("lecturerEmail");
 
+         // Update the lecturer details whenever the student selects a course.
         courseSelect.addEventListener("change", function () {
             const selectedCourse = this.options[this.selectedIndex];
 
-            if (this.value === "") {
+             // Hide the lecturer details if the placeholder option is selected.
+            if (this.value === "") 
+            {
                 lecturerSection.classList.add("d-none");
                 return;
             }
 
-            lecturerName.textContent =
-                selectedCourse.dataset.lecturerName;
+            // Read the lecturer details stored on the selected course option.
+            lecturerName.textContent = selectedCourse.dataset.lecturerName;
+            lecturerEmail.textContent = selectedCourse.dataset.lecturerEmail;
+            lecturerPhoto.src = selectedCourse.dataset.lecturerPhoto;
 
-            lecturerEmail.textContent =
-                selectedCourse.dataset.lecturerEmail;
-
-            lecturerPhoto.src =
-                selectedCourse.dataset.lecturerPhoto;
-
+             // Display the lecturer details beside the selected course.
             lecturerSection.classList.remove("d-none");
             lecturerSection.classList.add("d-flex");
         });
