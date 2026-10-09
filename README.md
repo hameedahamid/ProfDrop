@@ -227,7 +227,7 @@ These workflows provide build, test and container-build checks. Automated deploy
 
 ## ☁️ Deployment
 
-**Live URL:** Not deployed yet
+**Live URL:** https://profdropmvc20261009234042-d7aee2ctgmg7h3fq.austriaeast-01.azurewebsites.net/ 
 
 **Target platform:** Azure
 
