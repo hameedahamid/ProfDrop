@@ -1,6 +1,9 @@
 <Solution>
   <Folder Name="/Solution Items/">
+    <File Path=".dockerignore" />
+    <File Path=".gitignore" />
     <File Path="docker-compose.yml" />
+    <File Path="function-secrets/host.json" />
   </Folder>
   <Project Path="ProfDropFunctions/ProfDropFunctions.csproj" />
   <Project Path="ProfDropMVC/ProfDropMVC.csproj" />
